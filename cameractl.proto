@@ -1,0 +1,227 @@
+syntax = "proto3";
+
+message NvtCodecVencSettings {
+  enum InputSource {
+    INPUT_SOURCE_UNKNOWN = 0;
+    INPUT_SOURCE_SENSOR1 = 1;
+    INPUT_SOURCE_SENSOR2 = 2;
+    INPUT_SOURCE_SENSOR3 = 3;
+    INPUT_SOURCE_SENSOR4 = 4;
+    INPUT_SOURCE_UVC = 5;
+  }
+  enum Format {
+    FORMAT_UNKNOWN = 0;
+    FORMAT_MJPEG = 1;
+    FORMAT_H264 = 2;
+    FORMAT_H265 = 3;
+    FORMAT_YUV = 4;
+  }
+  enum Profile {
+    PROFILE_UNKNOWN = 0;
+    PROFILE_BASELINE = 1;
+    PROFILE_MAIN = 2;
+    PROFILE_HIGH = 3;
+  }
+  /*enum BitrateControlType {
+    BRC_NONE = 0;
+    BRC_CBR = 1;
+    BRC_VBR = 2;
+    BRC_FIXQP = 3;
+    BRC_EVBR = 4;
+  }*/
+
+  message VencCBR {
+    message IQp {
+      uint32 init = 1;
+      uint32 min = 2;
+      uint32 max = 3;
+    }
+    message PQp {
+      uint32 init = 1;
+      uint32 min = 2;
+      uint32 max = 3;
+    }
+    message RowRcSettings {
+      uint32 QpRange = 1;
+      uint32 QpStep = 2;
+    }
+    uint32 staticTime = 1;
+    uint32 byterate = 2;
+    uint32 framerate = 3;
+    uint32 gop = 4;
+    IQp iqp = 5;
+    PQp pqp = 6;
+    int32 IPWeight = 7;
+    optional RowRcSettings rowRcSettings = 8;
+  }
+
+  message VencVBR {
+    VencCBR cbrSettings = 1;
+    uint32 changePos = 2;
+  }
+  message VencEVBR {
+    VencCBR cbrSettings = 1;
+    int32 keyPPeriod = 2;
+    int32 keyPWeight = 3;
+    int32 motionAQStrength = 4;
+    uint32 stillFrameCnt = 5;
+    uint32 motionRatioThd = 6;
+    uint32 IPsnrCnd = 7;
+    uint32 PPsnrCnd = 8;
+    uint32 KeyPPsnrCnd = 9;
+  }
+
+  message VencNoneBRC {
+    uint32 frameRate = 1;
+    uint32 gop = 2;
+    uint32 byterate = 3;
+  }
+
+  message VencFIXQP {
+    uint32 byterate = 1;
+    uint32 framerate = 2;
+    uint32 gop = 3;
+    uint32 IFixQP = 4;
+    uint32 PFixQP = 5;
+  }
+  enum VencSVCT {
+    SVCT_DISABLE = 0;
+    SVCT_LAYER_1 = 1;
+    SVCT_LAYER_2 = 2;
+  }
+  enum VencRotation {
+    RT_NONE = 0;
+    RT_BUILTIN_90 = 1;
+    RT_BUILTIN_270 = 2;
+    RT_EXTEND_90 = 3;
+    RT_EXTEND_180 = 4;
+    RT_EXTEND_270 = 5;
+  }
+  message AQSettings {
+    uint32 aqStr = 1;
+    int32 sraqInitAslog2 = 2;
+    int32 maxSraq = 3;
+    int32 minSraq = 4;
+    int32 sraqConstAslog2 = 5;
+  }
+  message LTRSettings {
+    uint32 interval = 1;
+    uint32 preRef = 2;
+  }
+  uint32 VencNum = 1;
+  InputSource eInputSource = 2;
+  Format eFormat = 3;
+  optional Profile eProfile = 4;
+  uint32 TargetWidth = 5;
+  uint32 TargetHeight = 6;
+  //BitrateControlType eBRCType = 7;
+  oneof brcType {
+    VencNoneBRC noneBrcSettings = 8;
+    VencCBR CBRSettings = 9;
+    VencVBR VBRSettings = 10;
+    VencEVBR EVBRSettings = 11;
+    VencFIXQP FIXQPSettings = 12;
+  }
+  VencSVCT svctSettings = 13;
+  bool enableNR = 14;
+  VencRotation eVencRT = 15;
+  optional AQSettings aqSettings = 16;
+  LTRSettings ltrSettings = 17;
+  bool SEIEnable = 18;
+}
+enum VencType {
+  VENC_UNKNOWN = 0;
+  VENC_MAIN = 1;
+  VENC_AUX = 2;
+}
+enum StepMotorType {
+  STEP_MOTOR_UNKNOWN = 0;
+  STEP_MOTOR_PAN = 1;
+  STEP_MOTOR_TILT = 2;
+}
+enum StepMotorDirection {
+  STEP_DIRECTION_UNKNOWN = 0;
+  STEP_DIRECTION_FORWARD = 1;
+  STEP_DIRECTION_REVERSE = 2;
+}
+message ISPSettings {
+  enum ISPPreset {
+    PRESET_UNKNOWN = 0;
+    PRESET_DAY = 1;
+    PRESET_NIGHT = 2;
+    PRESET_NIGHT_IR = 3;
+  }
+  optional ISPPreset selectedPreset = 1;
+  optional bool nightMode = 2;
+  optional int32 brightness = 3;
+  optional int32 saturation = 4;
+  optional int32 hue = 5;
+  optional int32 contrast = 6;
+  optional int32 nrLevel = 7;
+  optional int32 eeLevel = 8;
+  optional int32 tnrLevel = 9;
+}
+message UserList {
+  repeated string username = 1;
+}
+message NewUserData {
+  bool exists = 1;
+  string username = 2;
+  optional string password = 3;
+}
+message ModeSwitchParams {
+  enum MSMode {
+    MS_UNKNOWN = 0;
+    MS_AUTO = 1;
+    MS_DAY = 2;
+    MS_NIGHT = 3;
+  }
+  optional bool irEnable = 1;
+  optional MSMode mode = 2;
+}
+message CamCtlRequest {
+  message vencSettingsSetRequest {
+    VencType tgtVenc = 1;
+    NvtCodecVencSettings newSettings = 2;
+  }
+  message motorMoveRequest {
+    StepMotorType motor = 1;
+    StepMotorDirection dir = 2;
+    uint32 steps = 3;
+  }
+  enum RequestType {
+    UNKNOWN = 0;
+    CMD = 1;
+  }
+  RequestType requestType = 1;
+  oneof cmdBody {
+    bool pingRequest = 2;
+    vencSettingsSetRequest setVencSettings = 3;
+    VencType getVencSettings = 4;
+    motorMoveRequest moveMotor = 5;
+    bool ispSettingGetReq = 6;
+    ISPSettings newIspSettings = 7;
+    bool enableIRLight = 8;
+    bool fetchUserList = 9;
+    NewUserData userModRequest = 10;
+    bool msParamsGetReq = 11;
+    ModeSwitchParams newMsParams = 12;
+  }
+}
+
+message CamCtlResponse {
+  enum ResponseType {
+    UNKNOWN = 0;
+    OK = 1;
+    INVALID_REQUEST = 2;
+    REQUEST_ERROR = 3;
+    DECODE_ERROR = 4;
+  }
+  ResponseType responseType = 1;
+  optional string errorReason = 2;
+  optional bool pingResponse = 3;
+  optional NvtCodecVencSettings currentSettings = 4;
+  optional ISPSettings currentISPSettings = 5;
+  optional UserList userList = 6;
+  optional ModeSwitchParams currentMsParams = 7;
+}
