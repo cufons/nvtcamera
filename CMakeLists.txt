@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_CXX_FLAGS -rdynamic)
 #set(CMAKE_CXX_FLAGS -Wl,-dynamic-linker,./interpreter_alt.so)
-include_directories(../protocom/protocom)
+include_directories(./protocom/protocom)
 
 find_library(MGLUE_LIB NAMES mipcglue PATHS ${MIPS_LIB_PATH})
 find_library(MIPC_LIB NAMES mipc PATHS ${MIPS_LIB_PATH})

@@ -1,0 +1,3 @@
+[submodule "protocom"]
+	path = protocom
+	url = git@github.com:cufons/protocom.git
